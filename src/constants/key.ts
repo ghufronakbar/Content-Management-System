@@ -1,0 +1,1 @@
+export const COOKIES_KEY = "aogaoeaeigaa3v5qv4vw89mw9489wtv498vw4tm9w8t4w"
