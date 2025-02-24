@@ -1,101 +1,58 @@
 import Image from "next/image";
+import Footer from "~/components/material/Footer";
+import Navbar from "~/components/material/Navbar";
+import Section from "~/components/material/Section";
+import ArticlePage from "~/components/page/ArticlePage";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <main className="!overflow-x-hidden">
+      <Navbar />
+      <Section id="hero" padded>
+        <div className="w-full min-h-screen h-full flex flex-col md:flex-row items-center justify-center relative gap-20 md:gap-0">
+          <div className="w-full md:w-2/3 lg:w-1/2 h-full flex flex-col gap-8 z-10 min-h-screen justify-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bely">
+              Make Experience into Typography
+            </h1>
+            <p className="text-md md:text-lg lg:text-xl text-neutral-600">
+              Learn and grow by drawing wisdom from the experiences of others.
+            </p>
+            <button className="w-fit h-fit rounded-lg px-4 md:px-8 py-2 md:py-4 bg-primary text-white drop-shadow-lg hover:bg-primary/80 transition-all flex flex-row gap-2 items-center font-semibold text-sm md:text-base">
+              Start Reading
+            </button>
+          </div>
+          <div className="w-full md:w-1/2 h-full md:relative absolute">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src={"/images/hero.png"}
+              alt=""
+              width={1920}
+              height={1080}
+              className="w-full h-full object-contain"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <Image
+              src={"/images/shape.png"}
+              alt=""
+              width={1920}
+              height={1080}
+              className="w-full h-full object-contain absolute top-0 left-0 -z-10"
+            />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </Section>
+      <Section id="greet" padded>
+        <div className="flex flex-col w-full h-full min-h-screen items-center justify-center gap-8">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bely text-center">
+            Reimagining what it means to work
+          </h2>
+          <div className="text-sm md:text-md lg:text-lg text-neutral-600 text-center">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
+            suscipit eos numquam culpa, quos recusandae. Aliquam temporibus
+            pariatur voluptate asperiores?
+          </div>
+        </div>
+      </Section>
+      <ArticlePage isLandingPage />
+      <Footer />
+    </main>
   );
 }

@@ -9,7 +9,9 @@ export interface SectionDTO {
 export interface ArticleDTO {
   slug: string;
   title: string;
+  category: string;
   published: boolean;
+  topics: string[];
   sections: SectionDTO[];
 }
 
@@ -22,6 +24,8 @@ export const initSectionDTO: SectionDTO = {
 export const initArticleDTO: ArticleDTO = {
   slug: "",
   title: "",
+  category: "",
+  topics: [],
   published: false,
   sections: [initSectionDTO],
 };

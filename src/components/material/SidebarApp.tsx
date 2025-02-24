@@ -91,7 +91,7 @@ export const Logo = () => {
         animate={{ opacity: 1 }}
         className="font-medium text-black  whitespace-pre"
       >
-        Lestari
+        Socio Engineer
       </motion.span>
     </Link>
   );

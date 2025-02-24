@@ -14,6 +14,9 @@ export default {
         primary: "#f87171",
       },
     },
+    fontFamily: {
+      bely: ["var(--font-bely)", "sans-serif"],
+    },
   },
   plugins: [],
 } satisfies Config;
