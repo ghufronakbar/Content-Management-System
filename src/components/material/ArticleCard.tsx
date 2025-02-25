@@ -16,6 +16,7 @@ interface Props {
   date: string | Date;
   comments: number;
   views: number;
+  
 }
 
 const ArticleCard: FC<Props> = ({

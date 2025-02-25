@@ -461,8 +461,8 @@ const InputSection: FC<Props> = ({
   imageFile,
 }) => {
   let rows = 1;
-  let font = "text-lg";
   let isInput = false;
+  let font = "text-lg";
 
   switch (type) {
     case "H1":

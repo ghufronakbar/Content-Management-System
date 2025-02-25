@@ -9,7 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DetailArticle } from "~/models/response/article";
 import axios from "axios";
 
-const FILTER_SORT = ["Latest", "Popular"];
+const FILTER_SORT = ["Relevant", "Latest", "Popular"];
 
 interface Props {
   isLandingPage?: boolean;
@@ -36,7 +36,7 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<DetailArticle[]>("/api/articles");
+      const response = await axios.get<DetailArticle[]>("/api/articles/client");
       setData(response.data);
       const uniqueCategories = Array.from(
         new Set(response.data.map((item) => item.category))
@@ -60,24 +60,21 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
     (item) =>
       category === "All Categories" ? true : item.category === category
   );
-  const filterSearch = filterCategory.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
-  );
-  const filterTopic = topic
-    ? filterSearch.filter((item) => item.topics.includes(topic))
-    : filterSearch;
+  const filterSearch = sortArticleByMatch(filterCategory, [topic], search);
 
   const filterSort = () => {
     switch (filter) {
+      case "Relevant":
+        return filterSearch.sort((a, b) => b.points - a.points);
       case "Latest":
-        return filterTopic.sort(
+        return filterSearch.sort(
           (a, b) =>
             Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
         );
       case "Popular":
-        return filterTopic.sort((a, b) => b.view - a.view);
+        return filterSearch.sort((a, b) => b.view - a.view);
       default:
-        return filterTopic;
+        return filterSearch;
     }
   };
 
@@ -123,7 +120,7 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
                     .join(". ")}
                   slug={item.slug}
                   title={item.title}
-                  topics={[]}
+                  topics={item.topics}
                   views={item.view}
                   image={
                     item.sections.find((item) => item.type === "Image")?.content
@@ -229,7 +226,7 @@ const SOCIAL_MEDIA = [
 ];
 
 const useFilterArticle = () => {
-  const [filter, setFilter] = useState<string>("Latest");
+  const [filter, setFilter] = useState<string>("Relevant");
   const [search, setSearch] = useState<string>("");
   const [category, setCategory] = useState<string>("All Categories");
   const [topic, setTopic] = useState<string>("");
@@ -238,14 +235,14 @@ const useFilterArticle = () => {
   const router = useRouter();
 
   const sp = useSearchParams();
-  const spFilter = sp.get("filter") || "Latest";
+  const spFilter = sp.get("filter") || "Relevant";
   const spSearch = sp.get("search") || "";
   const spCategory = sp.get("category") || "All Categories";
   const spTopic = sp.get("topic") || "";
 
   useEffect(() => {
     window.history.replaceState(null, "", pathname + searchParams);
-  }, [filter, search, category, topic]);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     setFilter(spFilter);
@@ -291,6 +288,34 @@ const useFilterArticle = () => {
     searchParams,
     goToArticle,
   };
+};
+
+interface DetailArticleWithPoints extends DetailArticle {
+  points: number;
+}
+
+export const sortArticleByMatch = (
+  data: DetailArticle[],
+  topics: string[],
+  search: string
+): DetailArticleWithPoints[] => {
+  const filteringWithTopics: DetailArticleWithPoints[] = data.map((item) => ({
+    ...item,
+    points: item.topics.filter((topic) => topics.includes(topic)).length * 3,
+  }));
+  const filteringWithSearch: DetailArticleWithPoints[] =
+    filteringWithTopics.filter((item) =>
+      item.title.toLowerCase().includes(search.toLowerCase())
+    );
+
+  let isTopicClick = false;
+  if (topics[0] !== "") {
+    isTopicClick = true;
+  }
+  const filteredData = filteringWithSearch
+    .sort((a, b) => b.points - a.points)
+    .filter((item) => (isTopicClick ? item.points > 0 : true));
+  return filteredData;
 };
 
 export default ArticlePage;
