@@ -1,24 +1,20 @@
 import { Metadata } from "next";
+import ChildLayout from "./child-layout";
 import { FC } from "react";
-import { ToastContainer } from "react-toastify";
-import SidebarApp from "~/components/material/SidebarApp";
-
-export const metadata: Metadata = {
-  title: "Dashboard | Socio Point",
-  description: "Dashboard",
-};
+import { serverSession } from "~/services/auth";
 
 interface Props {
   children: React.ReactNode;
 }
 
-const DashboardLayout: FC<Props> = ({ children }) => {
-  return (
-    <main className="w-full min-h-screen">
-      <SidebarApp>{children}</SidebarApp>
-      <ToastContainer />
-    </main>
-  );
+export const metadata: Metadata = {
+  title: "Dashboard | Socio Point",
+  description: "",
+};
+
+const DashboardLayout: FC<Props> = async ({ children }) => {
+  await serverSession();
+  return <ChildLayout>{children}</ChildLayout>;
 };
 
 export default DashboardLayout;

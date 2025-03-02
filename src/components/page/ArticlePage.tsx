@@ -1,6 +1,6 @@
 "use client";
 
-import SocialMedia from "~/components/material/SocialMedia";
+import AuthorCard from "~/components/material/AuthorCard";
 import ArticleCard from "~/components/material/ArticleCard";
 import Section from "../material/Section";
 import { FC, FormEvent, useEffect, useState } from "react";
@@ -8,6 +8,8 @@ import { cn } from "~/utils/cn";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DetailArticle } from "~/models/response/article";
 import axios from "axios";
+import { DetailUser } from "~/models/response/user";
+import LoadingPage from "~/app/loading";
 
 const FILTER_SORT = ["Relevant", "Latest", "Popular"];
 
@@ -32,6 +34,7 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [topics, setTopics] = useState<string[]>([]);
+  const [authors, setAuthors] = useState<DetailUser[]>([]);
 
   const fetchData = async () => {
     try {
@@ -52,8 +55,18 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
     }
   };
 
+  const fetchAuthors = async () => {
+    try {
+      const response = await axios.get<DetailUser[]>("/api/authors");
+      setAuthors(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchAuthors();
   }, []);
 
   const filterCategory = (isLandingPage ? data.slice(0, 5) : data).filter(
@@ -80,12 +93,7 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
 
   const filteredData = filterSort();
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-      </div>
-    );
+  if (loading) return <LoadingPage />;
 
   return (
     <Section id="article" padded>
@@ -122,6 +130,7 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
                   title={item.title}
                   topics={item.topics}
                   views={item.view}
+                  author={item.author}
                   image={
                     item.sections.find((item) => item.type === "Image")?.content
                   }
@@ -187,15 +196,15 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
             </form>
             <div className="w-full flex flex-col bg-neutral-100 p-4 gap-4 rounded-md">
               <p className="text-lg text-neutral-900 font-bold uppercase mt-2">
-                Connect With Me
+                Top Authors
               </p>
               <div className="flex flex-col flex-wrap gap-4 w-full">
-                {SOCIAL_MEDIA.map((item, index) => (
-                  <SocialMedia
-                    link={item.link}
-                    name={item.name}
-                    type={item.type}
+                {authors.map((item, index) => (
+                  <AuthorCard
+                    username={item.username}
+                    articles={item._count.articles}
                     key={index}
+                    image={item.image}
                   />
                 ))}
               </div>
@@ -206,24 +215,6 @@ const ArticlePage: FC<Props> = ({ isLandingPage }) => {
     </Section>
   );
 };
-
-const SOCIAL_MEDIA = [
-  {
-    name: "@ghufronakbar_",
-    type: "Instagram",
-    link: "https://instagram.com/ghufronakbar_",
-  },
-  {
-    name: "in/ghufronakbar",
-    type: "LinkedIn",
-    link: "https://linkedin.com/in/ghufronakbar_",
-  },
-  {
-    name: "lansProdigy",
-    type: "Twitter",
-    link: "https://twitter.com/lansProdigy",
-  },
-];
 
 const useFilterArticle = () => {
   const [filter, setFilter] = useState<string>("Relevant");

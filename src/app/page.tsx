@@ -1,13 +1,11 @@
 import Image from "next/image";
-import Footer from "~/components/material/Footer";
-import Navbar from "~/components/material/Navbar";
+import Link from "next/link";
 import Section from "~/components/material/Section";
 import ArticlePage from "~/components/page/ArticlePage";
 
 export default function Home() {
   return (
     <main className="!overflow-x-hidden">
-      <Navbar />
       <Section id="hero" padded>
         <div className="w-full min-h-screen h-full flex flex-col md:flex-row items-center justify-center relative gap-20 md:gap-0">
           <div className="w-full md:w-2/3 lg:w-1/2 h-full flex flex-col gap-8 z-10 min-h-screen justify-center">
@@ -17,9 +15,12 @@ export default function Home() {
             <p className="text-md md:text-lg lg:text-xl text-neutral-600">
               Learn and grow by drawing wisdom from the experiences of others.
             </p>
-            <button className="w-fit h-fit rounded-lg px-4 md:px-8 py-2 md:py-4 bg-primary text-white drop-shadow-lg hover:bg-primary/80 transition-all flex flex-row gap-2 items-center font-semibold text-sm md:text-base">
+            <Link
+              className="w-fit h-fit rounded-lg px-4 md:px-8 py-2 md:py-4 bg-primary text-white drop-shadow-lg hover:bg-primary/80 transition-all flex flex-row gap-2 items-center font-semibold text-sm md:text-base"
+              href="/article"
+            >
               Start Reading
-            </button>
+            </Link>
           </div>
           <div className="w-full md:w-1/2 h-full md:relative absolute">
             <Image
@@ -52,7 +53,6 @@ export default function Home() {
         </div>
       </Section>
       <ArticlePage isLandingPage />
-      <Footer />
     </main>
   );
 }

@@ -11,6 +11,7 @@ export const GET = async (req: NextRequest, { params }: Params) => {
     const article = await prisma.article.findUnique({
       include: {
         sections: true,
+        author: true,
       },
       where: {
         slug,
@@ -18,6 +19,10 @@ export const GET = async (req: NextRequest, { params }: Params) => {
     });
 
     if (!article) {
+      return NextResponse.json("Article not found", { status: 404 });
+    }
+
+    if (article && article.published === false) {
       return NextResponse.json("Article not found", { status: 404 });
     }
 

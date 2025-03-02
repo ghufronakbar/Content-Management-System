@@ -1,7 +1,11 @@
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { LOGO } from "~/constants/image";
 
 const Footer = () => {
+  const pathname = usePathname();
+  if (pathname.includes("dashboard")) return null;
+
   return (
     <footer className="w-full flex flex-col px-4 md:px-12 lg:px-18 py-20 gap-4 mt-20">
       <div className="w-full flex flex-row justify-between items-center">

@@ -25,6 +25,7 @@ import { ResUploadApi } from "~/models/response/upload";
 import { NextPage } from "next";
 import { DetailArticle } from "~/models/response/article";
 import Image from "next/image";
+import { getUser } from "~/services/auth";
 
 const EditArticle: NextPage = () => {
   const [form, setForm] = useState<ArticleDTO>(initArticleDTO);
@@ -32,9 +33,26 @@ const EditArticle: NextPage = () => {
   const [fetching, setFetching] = useState<boolean>(false);
   const [tempTopic, setTempTopic] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
+  const [username, setUsername] = useState<string>("");
   useBeforeUnload();
   const router = useRouter();
   const id = (useParams().id as string) || "";
+
+  const getUsername = async () => {
+    try {
+      const data = await getUser();
+      setUsername(data?.username || "");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data, {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      }
+    }
+  };
 
   const fetchCategories = async (): Promise<string[]> => {
     const { data } = await axios.get<DetailArticle[]>("/api/articles");
@@ -86,6 +104,7 @@ const EditArticle: NextPage = () => {
 
   useEffect(() => {
     fetchData();
+    getUsername();
   }, []);
 
   const onChange = (
@@ -393,7 +412,7 @@ const EditArticle: NextPage = () => {
             placeholder="my-first-article"
           />
           <span className="text-sm text-neutral-800 max-w-full">
-            Link will be {BASE_URL}/article/{form.slug}
+            Link will be {BASE_URL}/{username}/{form.slug}
           </span>
           <form className="w-full flex flex-col gap-2" onSubmit={onSubmitTopic}>
             <label className="font-medium text-lg text-black">Topics</label>

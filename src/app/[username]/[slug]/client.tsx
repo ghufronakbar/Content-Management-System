@@ -4,9 +4,8 @@ import { Section as SectionType } from "@prisma/client";
 import axios, { AxiosError } from "axios";
 import { NextPage } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
-import Navbar from "~/components/material/Navbar";
 import Section from "~/components/material/Section";
 import { sortArticleByMatch } from "~/components/page/ArticlePage";
 import { DetailArticle } from "~/models/response/article";
@@ -16,22 +15,31 @@ import { PLACEHOLDER } from "~/constants/image";
 import { MdComment } from "react-icons/md";
 import { IoIosArrowForward, IoMdEye } from "react-icons/io";
 import Link from "next/link";
-import Footer from "~/components/material/Footer";
 
 interface Props {
   slug: string;
+  username: string;
 }
 
-const DetailArticleClient: NextPage<Props> = ({ slug }) => {
+const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
   const [data, setData] = useState<DetailArticle>();
   const [noData, setNoData] = useState<boolean>(false);
   const [articles, setArticles] = useState<DetailArticle[]>([]);
+
+  const moreByAuthor = articles.filter(
+    (item) => item.author.username === username && item.slug !== slug
+  );
+
+  const router = useRouter();
   const fetchData = async () => {
     try {
       const [resData, resArticles] = await Promise.all([
         axios.get<DetailArticle>(`/api/articles/client/${slug}`),
         axios.get<DetailArticle[]>("/api/articles/client"),
       ]);
+      if (resData.data.author.username !== username) {
+        router.replace(`/${resData.data.author.username}/${slug}`);
+      }
       setData(resData.data);
       const newArticles = sortArticleByMatch(
         resArticles.data,
@@ -66,29 +74,54 @@ const DetailArticleClient: NextPage<Props> = ({ slug }) => {
   }
   return (
     <main>
-      <Navbar />
       <Section id="detail-article" padded>
         <div className="w-full min-h-screen container mx-auto flex flex-row gap-2 py-24">
           <div className="w-full md:w-2/3 lg:w-3/4 bg-neutral-100 p-4">
-            <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl font-bely">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bely">
               {data.title}
             </h1>
-            <div className="text-neutral-600 text-lg md:text-xl lg:text-2xl mt-2">
-              {data.category}
-            </div>
-            <p className="text-sm md:text-base">
-              {" "}
-              Posted on {formatDate(data.createdAt, true)}
-            </p>
-            <div className="flex flex-row flex-wrap gap-2">
-              {data.topics.map((topic, index) => (
-                <div
-                  key={index}
-                  className="text-primary cursor-pointer text-sm md:text-base"
-                >
-                  #{topic}
+            <div className="flex flex-col gap-4 lg:flex-row md:justify-between my-8">
+              <div className="flex flex-col gap-2">
+                <div className="bg-red-100 px-2 py-1 rounded-lg text-primary font-medium cursor-pointer text-xs tracking-wider w-fit h-fit">
+                  {data.category}
                 </div>
-              ))}
+                <div className="flex flex-row flex-wrap gap-2">
+                  {data.topics.map((topic, index) => (
+                    <Link
+                      key={index}
+                      href={`/article?filter=Relevant&search=&category=All%20Categories&topic=${topic}`}
+                      className="text-primary cursor-pointer text-sm md:text-base"
+                    >
+                      #{topic}
+                    </Link>
+                  ))}
+                </div>
+                <div className="flex flex-row gap-4 my-8">
+                  <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start w-full">
+                    <Image
+                      src={data.author.image || PLACEHOLDER}
+                      alt=""
+                      width={400}
+                      height={400}
+                      className="w-12 h-12 min-w-12 min-h-12 object-cover rounded-full"
+                    />
+                    <div className="flex flex-col self-center">
+                      <div className="text-lg font-semibold line-clamp-1 sm:max-w-[200px] sm:min-w-[200px] text-center sm:text-left">
+                        {data.author.name}
+                      </div>
+                      <div className="text-sm text-neutral-600 text-center sm:text-left">
+                        Posted On {formatDate(data.createdAt, true)}
+                      </div>
+                    </div>
+                    <Link
+                      className="cursor-pointer border px-4 py-2 rounded-md text-sm drop-shadow-md font-semibold bg-primary text-white text-center h-fit self-center"
+                      href={`/${data.author.username}`}
+                    >
+                      Visit
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="flex flex-col gap-4 bg-neutral-100 p-4 md:hidden mt-4">
               <div className="text-xl font-bold uppercase">
@@ -124,6 +157,33 @@ const DetailArticleClient: NextPage<Props> = ({ slug }) => {
                 />
               ))}
             </div>
+            {moreByAuthor.length > 0 && (
+              <div className="flex flex-col gap-4 bg-neutral-100 md:hidden mt-12">
+                <div className="text-xl font-bold uppercase">
+                  More By Author
+                </div>
+                {moreByAuthor.map((item, index) => (
+                  <ArticleCard
+                    key={index}
+                    category={item.category}
+                    comments={20}
+                    views={item.view}
+                    date={item.createdAt}
+                    image={
+                      item.sections.filter((item) => item.type === "Image")[0]
+                        ?.content
+                    }
+                    slug={item.slug}
+                    title={item.title}
+                    topics={item.topics}
+                    description={item.sections
+                      .filter((item) => item.type !== "Image")
+                      .map((item) => item.content)
+                      .join("")}
+                  />
+                ))}
+              </div>
+            )}
           </div>
           <div className="md:w-1/3 lg:w-1/4 h-fit sticky top-0 gap-4 md:flex flex-col hidden">
             <div className="flex flex-col gap-4 bg-neutral-100 p-4">
@@ -155,10 +215,36 @@ const DetailArticleClient: NextPage<Props> = ({ slug }) => {
                 />
               ))}
             </div>
+            {moreByAuthor.length > 0 && (
+              <div className="flex flex-col gap-4 bg-neutral-100 p-4">
+                <div className="text-xl font-bold uppercase">
+                  More By Author
+                </div>
+                {moreByAuthor.map((item, index) => (
+                  <ArticleCard
+                    key={index}
+                    category={item.category}
+                    comments={20}
+                    views={item.view}
+                    date={item.createdAt}
+                    image={
+                      item.sections.filter((item) => item.type === "Image")[0]
+                        ?.content
+                    }
+                    slug={item.slug}
+                    title={item.title}
+                    topics={item.topics}
+                    description={item.sections
+                      .filter((item) => item.type !== "Image")
+                      .map((item) => item.content)
+                      .join("")}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Section>
-      <Footer />
     </main>
   );
 };

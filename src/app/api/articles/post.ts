@@ -1,6 +1,7 @@
 import { SectionType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "~/config/prisma";
+import { serverSession } from "~/services/auth";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -72,6 +73,20 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json("Slug already taken", { status: 400 });
     }
 
+    const session = await serverSession();
+    const user = await prisma.user.findUnique({
+      where: {
+        email: session?.user?.email || "",
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json("User not found", { status: 400 });
+    }
+
     const create = await prisma.article.create({
       data: {
         sections: {
@@ -85,6 +100,7 @@ export const POST = async (req: NextRequest) => {
         view: 0,
         category,
         topics,
+        userId: user.id,
       },
       select: {
         slug: true,

@@ -5,6 +5,7 @@ import { IoIosArrowForward, IoMdEye } from "react-icons/io";
 import { FC } from "react";
 import Link from "next/link";
 import { formatDate } from "~/utils/formatDate";
+import { User } from "@prisma/client";
 
 interface Props {
   image?: string;
@@ -16,7 +17,7 @@ interface Props {
   date: string | Date;
   comments: number;
   views: number;
-  
+  author: User;
 }
 
 const ArticleCard: FC<Props> = ({
@@ -29,9 +30,10 @@ const ArticleCard: FC<Props> = ({
   date,
   comments,
   views,
+  author,
 }) => {
   return (
-    <Link href={`/article/${slug}`}>
+    <Link href={`/${author.username}/${slug}`}>
       <div className="flex flex-col md:flex-row w-full h-fit gap-4 text-neutral-600">
         <div className="w-full md:w-[40%] xl:w-[30%] flex flex-col gap-4">
           <Image
@@ -49,10 +51,26 @@ const ArticleCard: FC<Props> = ({
           <h4 className="text-2xl font-bold line-clamp-1 text-neutral-900">
             {title}
           </h4>
+          <div className="flex flex-row gap-4">
+            <Image
+              src={author.image || PLACEHOLDER}
+              alt=""
+              width={400}
+              height={400}
+              className="w-12 h-12 min-w-12 min-h-12 object-cover rounded-full"
+            />
+            <div className="flex flex-col self-center">
+              <div className="text-lg font-semibold line-clamp-1 max-w-[200px] min-w-[200px]">
+                {author.name}
+              </div>
+              <div className="text-sm text-neutral-600">
+                Posted On {formatDate(date, true)}
+              </div>
+            </div>
+          </div>
           <p className="line-clamp-3">{description}</p>
           <div>
             <p className="font-medium">{topics.join(", ")}</p>
-            <p className="text-sm">Posted On {formatDate(date, true)}</p>
           </div>
           <div className="flex flex-row justify-between items-center mt-4 flex-wrap gap-2">
             <div className="flex flex-row gap-4 items-center flex-wrap">

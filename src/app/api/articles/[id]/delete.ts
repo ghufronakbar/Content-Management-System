@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "~/config/prisma";
+import { serverSession } from "~/services/auth";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -8,9 +9,16 @@ interface Params {
 export const DELETE = async (req: NextRequest, { params }: Params) => {
   try {
     const { id } = await params;
+    const session = await serverSession();
+
     const article = await prisma.article.findUnique({
       select: {
         id: true,
+        author: {
+          select: {
+            email: true,
+          },
+        },
       },
       where: {
         id,
@@ -19,6 +27,10 @@ export const DELETE = async (req: NextRequest, { params }: Params) => {
 
     if (!article) {
       return NextResponse.json("Article not found", { status: 404 });
+    }
+
+    if (article.author?.email !== session?.user?.email) {
+      return NextResponse.json("Unauthorized", { status: 401 });
     }
 
     await prisma.article.delete({

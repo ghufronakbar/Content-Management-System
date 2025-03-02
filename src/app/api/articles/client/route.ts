@@ -8,6 +8,7 @@ export const GET = async () => {
     },
     include: {
       sections: true,
+      author: true,
     },
     where: {
       published: true,

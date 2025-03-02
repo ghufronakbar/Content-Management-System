@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "~/config/prisma";
+import { serverSession } from "~/services/auth";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -8,22 +9,28 @@ interface Params {
 export const PATCH = async (req: NextRequest, { params }: Params) => {
   try {
     const { id } = await params;
+    const session = await serverSession();
 
-    const checkId = await prisma.article.findUnique({
+    const checkArticle = await prisma.article.findUnique({
       where: { id },
       select: {
         id: true,
         published: true,
+        author: true,
       },
     });
 
-    if (!checkId) {
+    if (!checkArticle) {
       return NextResponse.json("Article not found", { status: 404 });
+    }
+
+    if (checkArticle.author?.email !== session?.user?.email) {
+      return NextResponse.json("Unauthorized", { status: 401 });
     }
 
     const create = await prisma.article.update({
       data: {
-        published: !checkId.published,
+        published: !checkArticle.published,
       },
       select: {
         published: true,

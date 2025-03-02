@@ -1,9 +1,10 @@
 import { Metadata, NextPage } from "next";
 import DetailArticleClient from "./client";
 import prisma from "~/config/prisma";
+import { BASE_URL } from "~/constants";
 
 interface Params {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; username: string }>;
 }
 
 const fetchArticle = async (slug: string) => {
@@ -14,9 +15,9 @@ const fetchArticle = async (slug: string) => {
 };
 
 export const generateMetadata = async (props: Params): Promise<Metadata> => {
-  const { slug } = await props.params;
+  const { slug, username } = await props.params;
   const article = await fetchArticle(slug);
-  const url = `https://socioengineer.vercel.app/article/${slug}`;
+  const url = `${BASE_URL}/${username}/${slug}`;
   return {
     title: `${article?.title} | Socio Engineer`,
     description: article?.sections
@@ -53,8 +54,8 @@ export const generateMetadata = async (props: Params): Promise<Metadata> => {
 };
 
 const DetailArticle: NextPage<Params> = async ({ params }) => {
-  const { slug } = await params;
-  return <DetailArticleClient slug={slug} />;
+  const { slug, username } = await params;
+  return <DetailArticleClient slug={slug} username={username} />;
 };
 
 export default DetailArticle;

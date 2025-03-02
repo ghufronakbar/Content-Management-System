@@ -11,7 +11,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        primary: "#f87171",
+        primary: "#5C0632",
       },
     },
     fontFamily: {

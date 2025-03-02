@@ -1,7 +1,7 @@
 "use client";
 
 import { SectionType } from "@prisma/client";
-import { ChangeEvent, FC, FormEvent, useState } from "react";
+import { ChangeEvent, FC, FormEvent, useEffect, useState } from "react";
 import { BiPlus, BiSave } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
 import { IoMdTrash } from "react-icons/io";
@@ -24,6 +24,7 @@ import { formatDate } from "~/utils/formatDate";
 import { ResUploadApi } from "~/models/response/upload";
 import { NextPage } from "next";
 import Image from "next/image";
+import { getUser } from "~/services/auth";
 
 interface PropsCreate {
   categories: string[];
@@ -31,10 +32,31 @@ interface PropsCreate {
 
 const CreateArticleClient: NextPage<PropsCreate> = ({ categories }) => {
   const [form, setForm] = useState<ArticleDTO>(initArticleDTO);
+  const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [tempTopic, setTempTopic] = useState<string>("");
   useBeforeUnload();
   const router = useRouter();
+
+  const getUsername = async () => {
+    try {
+      const data = await getUser();
+      setUsername(data?.username || "");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data, {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    getUsername();
+  }, []);
 
   const onSubmitTopic = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -351,7 +373,7 @@ const CreateArticleClient: NextPage<PropsCreate> = ({ categories }) => {
             placeholder="my-first-article"
           />
           <span className="text-sm text-neutral-800 max-w-full">
-            Link will be {BASE_URL}/article/{form.slug}
+            Link will be {BASE_URL}/{username}/{form.slug}
           </span>
           <form className="w-full flex flex-col gap-2" onSubmit={onSubmitTopic}>
             <label className="font-medium text-lg text-black">Topics</label>
