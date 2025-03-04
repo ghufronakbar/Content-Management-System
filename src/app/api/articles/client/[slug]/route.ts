@@ -26,6 +26,18 @@ export const GET = async (req: NextRequest, { params }: Params) => {
       return NextResponse.json("Article not found", { status: 404 });
     }
 
+    await prisma.article.update({
+      where: {
+        id: article.id,
+      },
+      data: {
+        view: article.view + 1,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     return NextResponse.json(article);
   } catch (error) {
     console.log(error);

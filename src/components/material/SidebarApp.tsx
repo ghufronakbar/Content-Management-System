@@ -10,6 +10,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { DEFAULT_PROFILE, LOGO } from "~/constants/image";
+import { signOut, useSession } from "next-auth/react";
 
 const iconClassName = "text-neutral-700  h-5 w-5 flex-shrink-0";
 
@@ -37,6 +38,7 @@ export default function SidebarApp({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState<boolean>(false);
+  const { data: session } = useSession();
 
   return (
     <div className="rounded-md flex flex-col md:flex-row bg-gray-100 w-full flex-1 mx-auto border border-neutral-200 overflow-hidden h-screen">
@@ -46,18 +48,26 @@ export default function SidebarApp({
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
+                <SidebarLink
+                  key={idx}
+                  link={link}
+                  onClick={() => {
+                    if (link.href === "/") {
+                      signOut();
+                    }
+                  }}
+                />
               ))}
             </div>
           </div>
           <div>
             <SidebarLink
               link={{
-                label: "socio@gmail.com",
-                href: "/admin/profile",
+                label: session?.user?.email || "Profile",
+                href: "/dashboard/profile",
                 icon: (
                   <Image
-                    src={DEFAULT_PROFILE}
+                    src={session?.user?.image || DEFAULT_PROFILE}
                     className="h-7 w-7 flex-shrink-0 rounded-full"
                     width={50}
                     height={50}
@@ -84,7 +94,7 @@ export const Logo = () => {
         width={50}
         height={50}
         alt="Avatar"
-        className="h-5 w-6 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0 object-cover"
+        className="h-auto w-6 flex-shrink-0 object-cover"
       />
       <motion.span
         initial={{ opacity: 0 }}
@@ -107,7 +117,7 @@ export const LogoIcon = () => {
         width={50}
         height={50}
         alt="Avatar"
-        className="h-5 w-6   rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0 object-cover"
+        className="h-5 w-6 flex-shrink-0 object-contain"
       />
     </Link>
   );

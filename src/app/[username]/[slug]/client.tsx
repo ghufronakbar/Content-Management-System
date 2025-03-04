@@ -4,7 +4,7 @@ import { Section as SectionType } from "@prisma/client";
 import axios, { AxiosError } from "axios";
 import { NextPage } from "next";
 import Image from "next/image";
-import { notFound, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
 import Section from "~/components/material/Section";
 import { sortArticleByMatch } from "~/components/page/ArticlePage";
@@ -12,9 +12,10 @@ import { DetailArticle } from "~/models/response/article";
 import { cn } from "~/utils/cn";
 import { formatDate } from "~/utils/formatDate";
 import { PLACEHOLDER } from "~/constants/image";
-import { MdComment } from "react-icons/md";
-import { IoIosArrowForward, IoMdEye } from "react-icons/io";
 import Link from "next/link";
+import ArticleCardMini from "~/components/material/ArticleCardMini";
+import NotFoundPage from "~/app/not-found";
+import { IoMdEye } from "react-icons/io";
 
 interface Props {
   slug: string;
@@ -63,7 +64,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
   }, [data]);
 
   if (noData) {
-    return notFound();
+    return <NotFoundPage />;
   }
   if (!data) {
     return (
@@ -84,6 +85,10 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
               <div className="flex flex-col gap-2">
                 <div className="bg-red-100 px-2 py-1 rounded-lg text-primary font-medium cursor-pointer text-xs tracking-wider w-fit h-fit">
                   {data.category}
+                </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <IoMdEye className="w-6 h-6 text-neutral-600" />
+                  {data.view} Views
                 </div>
                 <div className="flex flex-row flex-wrap gap-2">
                   {data.topics.map((topic, index) => (
@@ -137,7 +142,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
             <div className="flex flex-col gap-4 bg-neutral-100 md:hidden mt-12">
               <div className="text-xl font-bold uppercase">Relevant</div>
               {articles.map((item, index) => (
-                <ArticleCard
+                <ArticleCardMini
                   key={index}
                   category={item.category}
                   comments={20}
@@ -154,6 +159,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
                     .filter((item) => item.type !== "Image")
                     .map((item) => item.content)
                     .join("")}
+                  username={username}
                 />
               ))}
             </div>
@@ -163,7 +169,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
                   More By Author
                 </div>
                 {moreByAuthor.map((item, index) => (
-                  <ArticleCard
+                  <ArticleCardMini
                     key={index}
                     category={item.category}
                     comments={20}
@@ -180,6 +186,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
                       .filter((item) => item.type !== "Image")
                       .map((item) => item.content)
                       .join("")}
+                    username={username}
                   />
                 ))}
               </div>
@@ -195,7 +202,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
             <div className="flex flex-col gap-4 bg-neutral-100 p-4">
               <div className="text-xl font-bold uppercase">Relevant</div>
               {articles.map((item, index) => (
-                <ArticleCard
+                <ArticleCardMini
                   key={index}
                   category={item.category}
                   comments={20}
@@ -212,6 +219,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
                     .filter((item) => item.type !== "Image")
                     .map((item) => item.content)
                     .join("")}
+                  username={username}
                 />
               ))}
             </div>
@@ -221,7 +229,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
                   More By Author
                 </div>
                 {moreByAuthor.map((item, index) => (
-                  <ArticleCard
+                  <ArticleCardMini
                     key={index}
                     category={item.category}
                     comments={20}
@@ -238,6 +246,7 @@ const DetailArticleClient: NextPage<Props> = ({ slug, username }) => {
                       .filter((item) => item.type !== "Image")
                       .map((item) => item.content)
                       .join("")}
+                    username={username}
                   />
                 ))}
               </div>
@@ -398,74 +407,5 @@ const TableOfContent: FC<PropsTOC> = ({ items }) => {
         </Link>
       ))}
     </div>
-  );
-};
-
-interface PropsArticle {
-  image?: string;
-  title: string;
-  description: string;
-  slug: string;
-  category: string;
-  topics: string[];
-  date: string | Date;
-  comments: number;
-  views: number;
-}
-
-const ArticleCard: FC<PropsArticle> = ({
-  image,
-  category,
-  title,
-  description,
-  slug,
-  topics,
-  date,
-  comments,
-  views,
-}) => {
-  return (
-    <Link href={`/article/${slug}`}>
-      <div className="flex flex-col  w-full h-fit gap-4 text-neutral-600">
-        <div className="w-full flex flex-col gap-4">
-          <Image
-            src={image || PLACEHOLDER}
-            alt=""
-            width={810}
-            height={540}
-            className="w-full h-auto aspect-video object-cover rounded-lg"
-          />
-        </div>
-        <div className="flex flex-col gap-4 w-full">
-          <div className="bg-red-100 px-2 py-1 rounded-lg text-primary font-medium cursor-pointer text-xs tracking-wider w-fit h-fit">
-            {category}
-          </div>
-          <h4 className="text-2xl font-bold line-clamp-1 text-neutral-900">
-            {title}
-          </h4>
-          <p className="line-clamp-3">{description}</p>
-          <div>
-            <p className="font-medium">{topics.join(", ")}</p>
-            <p className="text-sm">Posted On {formatDate(date, true)}</p>
-          </div>
-          <div className="flex flex-row justify-between items-center mt-4 flex-wrap gap-2">
-            <div className="flex flex-row gap-4 items-center flex-wrap">
-              <div className="flex flex-row gap-2 items-center">
-                <MdComment className="w-6 h-6 text-neutral-600" />
-                {comments} Comments
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <IoMdEye className="w-6 h-6 text-neutral-600" />
-                {views} Views
-              </div>
-            </div>
-            <div className="flex flex-row gap-2 items-center text-primary cursor-pointer">
-              Read More
-              <IoIosArrowForward className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 };

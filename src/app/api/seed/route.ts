@@ -8,6 +8,7 @@ async function seed() {
       slug: "html-dasar",
       title: "HTML Dasar",
       published: true,
+      userId: "",
       category: "Programming",
       view: 0,
       topics: ["HTML", "Web Development", "Programming"],
@@ -54,8 +55,7 @@ async function seed() {
               type: SectionType.Image,
             },
             {
-              content:
-                'HTML mempermudah pengembangan web secara signifikan.',
+              content: "HTML mempermudah pengembangan web secara signifikan.",
               type: SectionType.Quote,
             },
             {
@@ -82,6 +82,7 @@ async function seed2() {
       published: true,
       category: "Programming",
       view: 0,
+      userId: "",
       topics: ["React", "JavaScript", "Web Development"],
       sections: {
         createMany: {
@@ -128,7 +129,7 @@ async function seed2() {
             // Quote - Dari Penemu
             {
               content:
-                'Saya ingin membuat sesuatu yang lebih efisien dan dapat digunakan dalam aplikasi web besar.',
+                "Saya ingin membuat sesuatu yang lebih efisien dan dapat digunakan dalam aplikasi web besar.",
               type: SectionType.Quote,
             },
             // H4 - Digunakan oleh Industri Besar
@@ -138,8 +139,7 @@ async function seed2() {
             },
             // Number - Pengguna React di Industri Besar
             {
-              content:
-                "Facebook\nInstagram\nAirbnb\nNetflix\nUber",
+              content: "Facebook\nInstagram\nAirbnb\nNetflix\nUber",
               type: SectionType.Number,
             },
             // H4 - Versi React

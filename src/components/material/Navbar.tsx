@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LOGO, PLACEHOLDER } from "~/constants/image";
 import { signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const Navbar = () => {
@@ -13,11 +13,41 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+  const [showNavbar, setShowNavbar] = useState(true);
+  let lastScrollY = 0;
 
-  if(pathname.includes("dashboard")) return null
+  // Menambahkan efek scroll untuk hide/show navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window !== "undefined") {
+        if (window.scrollY > lastScrollY) {
+          // scroll ke bawah, sembunyikan navbar
+          setShowNavbar(false);
+        } else {
+          // scroll ke atas, tampilkan navbar
+          setShowNavbar(true);
+        }
+        lastScrollY = window.scrollY;
+      }
+    };
+
+    // Tambahkan event listener scroll
+    window.addEventListener("scroll", handleScroll);
+
+    // Hapus event listener saat komponen di-unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  if (pathname.includes("dashboard")) return null;
 
   return (
-    <nav className="bg-white shadow-md fixed top-0 left-0 right-0 transition-transform duration-300 ease-in-out z-50">
+    <nav
+      className={`bg-white shadow-md fixed top-0 left-0 right-0 transition-transform duration-300 ease-in-out z-50 ${
+        showNavbar ? "transform translate-y-0" : "-translate-y-full"
+      }`}
+    >
       <div className="container mx-auto px-4 py-4 flex justify-between">
         <Link href="/">
           <Image

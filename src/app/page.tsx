@@ -1,7 +1,13 @@
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Section from "~/components/material/Section";
 import ArticlePage from "~/components/page/ArticlePage";
+
+export const metadata: Metadata = {
+  title: "Socio Engineer",
+  description: "",
+};
 
 export default function Home() {
   return (

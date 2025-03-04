@@ -68,19 +68,10 @@ export const authOptions: AuthOptions = {
         await prisma.user.create({
           data: {
             email: user.email,
-            name: user.name,
+            name: user.name || `User ${user.id}`,
             image: user.image,
             provider: provider,
-          },
-        });
-      } else {
-        await prisma.user.update({
-          where: {
-            email: user.email,
-          },
-          data: {
-            name: user.name,
-            image: user.image,
+            username: user.email.split("@")[0].toLowerCase(),
           },
         });
       }

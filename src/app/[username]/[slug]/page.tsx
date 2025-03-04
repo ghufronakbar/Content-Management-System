@@ -19,7 +19,7 @@ export const generateMetadata = async (props: Params): Promise<Metadata> => {
   const article = await fetchArticle(slug);
   const url = `${BASE_URL}/${username}/${slug}`;
   return {
-    title: `${article?.title} | Socio Engineer`,
+    title: `${article?.title || "Not Found"} | Socio Engineer`,
     description: article?.sections
       .filter((section) => section.type !== "Image")
       .map((section) => section.content)

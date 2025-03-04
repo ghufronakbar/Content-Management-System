@@ -15,16 +15,17 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  username  String    @unique
-  email     String    @unique
-  password  String?
-  image     String?
-  provider  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
-  articles  Article[]
+  id          String    @id @default(uuid())
+  name        String
+  username    String    @unique
+  email       String    @unique
+  password    String?
+  image       String?
+  description String    @db.Text() @default("")
+  provider    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  articles    Article[]
 
   @@index([username, email])
 }
