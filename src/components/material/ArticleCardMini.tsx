@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FC } from "react";
 import { formatDate } from "~/utils/formatDate";
 import { PLACEHOLDER } from "~/constants/image";
-import { MdComment } from "react-icons/md";
+// import { MdComment } from "react-icons/md";
 import { IoIosArrowForward, IoMdEye } from "react-icons/io";
 import Link from "next/link";
 
@@ -29,7 +29,7 @@ const ArticleCardMini: FC<PropsArticle> = ({
   slug,
   topics,
   date,
-  comments,
+  // comments,
   views,
   username,
 }) => {
@@ -59,10 +59,10 @@ const ArticleCardMini: FC<PropsArticle> = ({
           </div>
           <div className="flex flex-row justify-between items-center mt-4 flex-wrap gap-2">
             <div className="flex flex-row gap-4 items-center flex-wrap">
-              <div className="flex flex-row gap-2 items-center">
+              {/* <div className="flex flex-row gap-2 items-center">
                 <MdComment className="w-6 h-6 text-neutral-600" />
                 {comments} Comments
-              </div>
+              </div> */}
               <div className="flex flex-row gap-2 items-center">
                 <IoMdEye className="w-6 h-6 text-neutral-600" />
                 {views} Views
