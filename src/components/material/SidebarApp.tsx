@@ -4,7 +4,7 @@ import { Sidebar, SidebarBody, SidebarLink } from "~/components/ui/sidebar";
 import {
   IconArrowLeft,
   IconArticle,
-  IconBrandTabler,
+  // IconBrandTabler,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -15,11 +15,11 @@ import { signOut, useSession } from "next-auth/react";
 const iconClassName = "text-neutral-700  h-5 w-5 flex-shrink-0";
 
 const links: LinksProps[] = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: <IconBrandTabler className={iconClassName} />,
-  },
+  // {
+  //   label: "Dashboard",
+  //   href: "/dashboard",
+  //   icon: <IconBrandTabler className={iconClassName} />,
+  // },
   {
     label: "Article",
     href: "/dashboard/article",

@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { LOGO, PLACEHOLDER } from "~/constants/image";
+import { DEFAULT_PROFILE, LOGO } from "~/constants/image";
 import { signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -73,7 +73,7 @@ const Navbar = () => {
                 : session?.user?.name || "Sign In"}
             </div>
             <Image
-              src={session?.user?.image || PLACEHOLDER}
+              src={session?.user?.image || DEFAULT_PROFILE}
               alt=""
               width={40}
               height={40}

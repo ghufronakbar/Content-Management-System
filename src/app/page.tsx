@@ -52,9 +52,7 @@ export default function Home() {
             Reimagining what it means to work
           </h2>
           <div className="text-sm md:text-md lg:text-lg text-neutral-600 text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
-            suscipit eos numquam culpa, quos recusandae. Aliquam temporibus
-            pariatur voluptate asperiores?
+          A platform for writers to share ideas and creations, shaping new perspectives for society through writing.
           </div>
         </div>
       </Section>
