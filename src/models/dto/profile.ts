@@ -5,12 +5,14 @@ export interface ProfileDTO {
   name: string;
   username: string;
   description: string;
+  title: string;
 }
 
 export const initProfileDTO: ProfileDTO = {
   name: "",
   username: "",
   description: "",
+  title: "",
 };
 
 export const initUser: User = {
@@ -19,6 +21,8 @@ export const initUser: User = {
   email: "",
   image: PLACEHOLDER,
   description: "",
+  role: "User",
+  title: "",
   createdAt: new Date(),
   updatedAt: new Date(),
   provider: "local",

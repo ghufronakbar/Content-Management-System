@@ -11,7 +11,14 @@ export const GET = async () => {
       author: true,
     },
     where: {
-      published: true,
+      AND: [
+        {
+          published: true,
+        },
+        {
+          status: "Confirmed",
+        },
+      ],
     },
   });
   return NextResponse.json(articles);

@@ -8,18 +8,23 @@ export const GET = async () => {
         select: {
           articles: {
             where: {
-              published: true,
+              AND: [
+                {
+                  status: "Confirmed",
+                },
+                {
+                  published: true,
+                },
+              ],
             },
           },
         },
       },
     },
-    orderBy: {
-      articles: {
-        _count: "desc",
-      },
-    },
     take: 5,
   });
-  return NextResponse.json(authors);
+  const orderedAuthors = authors.sort(
+    (a, b) => b._count.articles - a._count.articles
+  );
+  return NextResponse.json(orderedAuthors);
 };

@@ -17,17 +17,25 @@ import { cn } from "~/utils/cn";
 import { formatDate } from "~/utils/formatDate";
 import { optToast } from "~/utils/toast";
 
-const ArticlePageClient: NextPage = () => {
+const UserArticlePageClient: NextPage = () => {
   const [search, setSearch] = useState<string>("");
   const [data, setData] = useState<DetailArticle[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState<number | null>(null);
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
-  const email = session?.user.email;
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const filteredData = data.filter((item) => item.author.email === email);
+  if (session?.user.role !== "Admin" && status !== "loading") {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <h1 className="text-2xl font-bold">Access Denied</h1>
+      </div>
+    );
+  }
 
   const fetchData = async () => {
     try {
@@ -40,75 +48,7 @@ const ArticlePageClient: NextPage = () => {
     }
   };
 
-  const deleteArticle = async (id: string) => {
-    try {
-      setMenuOpen(null);
-      setData(filteredData.filter((item) => item.id !== id));
-      toast("Article deleted successfully", {
-        ...optToast,
-        type: "success",
-        position: "bottom-right",
-        autoClose: 3000,
-      });
-      await axios.delete(`/api/articles/${id}`);
-    } catch (error) {
-      console.error("Error deleting article:", error);
-      if (error instanceof AxiosError) {
-        toast(error.response?.data, {
-          ...optToast,
-          type: "error",
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-      } else if (error instanceof Error) {
-        toast(error.message, {
-          ...optToast,
-          type: "error",
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-      }
-    } finally {
-      fetchData();
-    }
-  };
-
-  const publishArticle = async (id: string) => {
-    try {
-      setMenuOpen(null);
-      const response = await axios.patch(`/api/articles/${id}`);
-      fetchData();
-      toast(response?.data?.toString(), {
-        ...optToast,
-        type: "success",
-        position: "bottom-right",
-        autoClose: 3000,
-      });
-    } catch (error) {
-      console.error("Error deleting article:", error);
-      if (error instanceof AxiosError) {
-        toast(error.response?.data, {
-          ...optToast,
-          type: "error",
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-      } else if (error instanceof Error) {
-        toast(error.message, {
-          ...optToast,
-          type: "error",
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const filteredArticles = filteredData.filter((item) =>
+  const filteredArticles = data.filter((item) =>
     item.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -126,9 +66,48 @@ const ArticlePageClient: NextPage = () => {
     }
   };
 
+  const onHandleAccept = async (id: string, acc: boolean) => {
+    try {
+      setMenuOpen(null);
+      toast("Loading...", {
+        ...optToast,
+        type: "info",
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      const res = await axios.patch(`/api/articles/${id}/accept`, {
+        accept: acc,
+      });
+      await fetchData();
+      toast(res?.data?.toString(), {
+        ...optToast,
+        type: "success",
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      if (error instanceof AxiosError) {
+        toast(error.response?.data, {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      } else if (error instanceof Error) {
+        toast(error.message, {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      }
+    }
+  };
+
   return (
     <DashboardLayout
-      title="Your Articles"
+      title="All Articles"
       childrenHeader={
         <div className="flex gap-4">
           <Link href="/dashboard/create">
@@ -180,10 +159,9 @@ const ArticlePageClient: NextPage = () => {
             key={item.id}
             isMenuOpen={menuOpen === index}
             onClickMenu={() => onClickMenu(index)}
-            onDelete={() => deleteArticle(item.id)}
             onMenuEnter={() => onMenuEnter(index)}
             onMenuLeave={() => setMenuOpen(null)}
-            onPublish={() => publishArticle(item.id)}
+            onHandleAccept={onHandleAccept}
             user={session?.user}
           />
         ))}
@@ -197,14 +175,13 @@ const ArticlePageClient: NextPage = () => {
   );
 };
 
-export default ArticlePageClient;
+export default UserArticlePageClient;
 
 interface ListArticleProps {
   article: DetailArticle;
   isMenuOpen: boolean;
   onClickMenu: () => void;
-  onDelete: () => void;
-  onPublish: () => void;
+  onHandleAccept: (id: string, acc: boolean) => void;
   onMenuEnter: MouseEventHandler<HTMLDivElement>;
   onMenuLeave: MouseEventHandler<HTMLDivElement>;
   user?: User;
@@ -214,8 +191,7 @@ const ListArticle: FC<ListArticleProps> = ({
   article,
   isMenuOpen,
   onClickMenu,
-  onDelete,
-  onPublish,
+  onHandleAccept,
   onMenuEnter,
   onMenuLeave,
   user,
@@ -250,30 +226,46 @@ const ListArticle: FC<ListArticleProps> = ({
               <MdMenu className="w-6 h-6 cursor-pointer" />
               {isMenuOpen && (
                 <div className="absolute flex flex-col right-0 top-8 border border-neutral-200 rounded-lg overflow-hidden z-50 bg-white shadow-md w-40">
-                  <Link href={`/dashboard/article/${article.id}`}>
-                    <div className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100">
-                      Edit
+                  {article.status !== "Confirmed" &&
+                  user?.username === article.author.username ? (
+                    <>
+                      <div
+                        className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
+                        onClick={() => onHandleAccept(article.id, true)}
+                      >
+                        Confirm
+                      </div>
+
+                      <div
+                        className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
+                        onClick={() => onHandleAccept(article.id, false)}
+                      >
+                        Reject
+                      </div>
+                    </>
+                  ) : user?.username !== article.author.username &&
+                    article.author.role === "Admin" ? (
+                    <div
+                      className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
+                      onClick={() =>
+                        onHandleAccept(
+                          article.id,
+                          article.status === "Confirmed" ? false : true
+                        )
+                      }
+                    >
+                      {article.status === "Confirmed" ? "Reject" : "Confirm"}
                     </div>
-                  </Link>
-                  <div
-                    className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
-                    onClick={onPublish}
-                  >
-                    {article.published ? "Make as Draft" : "Publish"}
-                  </div>
-                  <div
-                    className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
-                    onClick={() => {
-                      const ok = confirm(
-                        "Are you sure to delete this article?"
-                      );
-                      if (ok) onDelete();
-                    }}
-                  >
-                    Delete
-                  </div>
+                  ) : (
+                    <Link
+                      className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
+                      href={`/dashboard/article/${article.id}`}
+                    >
+                      Edit
+                    </Link>
+                  )}
                   <Link
-                    href={`/${user?.username}/${article.slug}`}
+                    href={`/${article.author.username}/${article.slug}`}
                     className="border border-neutral-200 px-4 py-1 text-center hover:bg-neutral-100"
                     target="_blank"
                   >
@@ -290,7 +282,7 @@ const ListArticle: FC<ListArticleProps> = ({
               .join("")}
           </div>
         </div>
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-2 xl:gap-0 mt-2 xl:mt-0">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-2 xl:gap-0 mt-2 xl:mt-0">
           <div className="flex flex-row gap-2 items-center">
             <div className="font-medium flex flex-row gap-2 items-center">
               <IoMdEye /> {article.view} Views
@@ -315,8 +307,15 @@ const ListArticle: FC<ListArticleProps> = ({
               </div>
             )}
           </div>
-          <div className="text-xs text-neutral-500">
-            Last Updated {formatDate(article.updatedAt, true)}
+          <div className="flex flex-col items-end">
+            {user?.username === article.author.username && (
+              <div className="flex flex-row gap-2 items-center text-xs">
+                Your Article
+              </div>
+            )}
+            <div className="text-xs text-neutral-500">
+              Last Updated {formatDate(article.updatedAt, true)}
+            </div>
           </div>
         </div>
       </div>

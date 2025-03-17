@@ -330,7 +330,14 @@ const ProfilePage: NextPage = () => {
           <span className="text-sm text-neutral-800 max-w-full">
             Link will be {BASE_URL}/{form.username}
           </span>
-
+          <InputSection
+            label="Title"
+            type="H4"
+            value={form.title}
+            onChange={(e) => onChange(e, "title")}
+            imageFile={null}
+            placeholder="Technical Lead"
+          />
           <InputSection
             label="Bio"
             type="Text"

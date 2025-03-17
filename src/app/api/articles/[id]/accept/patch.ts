@@ -9,7 +9,16 @@ interface Params {
 export const PATCH = async (req: NextRequest, { params }: Params) => {
   try {
     const { id } = await params;
+    const data = await req.json();
+    const { accept } = data;
+    console.log(data);
+    if (typeof accept !== "boolean")
+      return NextResponse.json("Invalid format", { status: 400 });
+
     const session = await serverSession();
+
+    if (session.user.role !== "Admin")
+      return NextResponse.json("Unauthorized", { status: 401 });
 
     const checkArticle = await prisma.article.findUnique({
       where: { id },
@@ -25,16 +34,10 @@ export const PATCH = async (req: NextRequest, { params }: Params) => {
       return NextResponse.json("Article not found", { status: 404 });
     }
 
-    if (checkArticle.author?.email !== session?.user?.email) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-
-    if (checkArticle.status === "Rejected")
-      return NextResponse.json("Article rejected", { status: 400 });
-
     const create = await prisma.article.update({
       data: {
-        published: !checkArticle.published,
+        status: accept ? "Confirmed" : "Rejected",
+        published: accept === false ? false : checkArticle.published,
       },
       select: {
         published: true,
@@ -45,8 +48,8 @@ export const PATCH = async (req: NextRequest, { params }: Params) => {
     });
     return NextResponse.json(
       create.published
-        ? "The article has been successfully published."
-        : "The article has been successfully saved as a draft."
+        ? "The article has been successfully accepted."
+        : "The article has been successfully rejected."
     );
   } catch (error) {
     console.log(error);

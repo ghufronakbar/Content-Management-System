@@ -80,12 +80,14 @@ export const POST = async (req: NextRequest) => {
       },
       select: {
         id: true,
+        role: true,
       },
     });
 
     if (!user) {
       return NextResponse.json("User not found", { status: 400 });
     }
+    const isAdmin = user?.role === "Admin";
 
     const create = await prisma.article.create({
       data: {
@@ -101,6 +103,7 @@ export const POST = async (req: NextRequest) => {
         category,
         topics,
         userId: user.id,
+        status: isAdmin ? "Confirmed" : "Pending",
       },
       select: {
         slug: true,

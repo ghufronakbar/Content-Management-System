@@ -63,7 +63,7 @@ const SignInPageClient = () => {
         </label>
         <input
           type="password"
-          placeholder=""
+          placeholder="********"
           className="w-full h-fit px-4 py-2 rounded-lg border border-neutral-200 text-sm"
           name="password"
         />

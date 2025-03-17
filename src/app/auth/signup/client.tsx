@@ -42,6 +42,16 @@ const SignUpPageClient = () => {
           placeholder="some@example.com"
           className="w-full h-fit px-4 py-2 rounded-lg border border-neutral-200 text-sm"
         />
+        <label htmlFor="name" className="text-sm -mb-2">
+          Title
+        </label>
+        <input
+          type="text"
+          value={form.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })}
+          placeholder="Technical Lead"
+          className="w-full h-fit px-4 py-2 rounded-lg border border-neutral-200 text-sm"
+        />
         <label htmlFor="password" className="text-sm -mb-2">
           Password
         </label>

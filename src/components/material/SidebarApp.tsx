@@ -4,7 +4,9 @@ import { Sidebar, SidebarBody, SidebarLink } from "~/components/ui/sidebar";
 import {
   IconArrowLeft,
   IconArticle,
-  // IconBrandTabler,
+  IconInfoCircle,
+  IconNews,
+  // IconUser,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -21,7 +23,22 @@ const links: LinksProps[] = [
   //   icon: <IconBrandTabler className={iconClassName} />,
   // },
   {
-    label: "Article",
+    label: "Information",
+    href: "/dashboard/information",
+    icon: <IconInfoCircle className={iconClassName} />,
+  },
+  // {
+  //   label: "User",
+  //   href: "/dashboard/user",
+  //   icon: <IconUser className={iconClassName} />,
+  // },
+  {
+    label: "User Article",
+    href: "/dashboard/user-article",
+    icon: <IconNews className={iconClassName} />,
+  },
+  {
+    label: "Your Article",
     href: "/dashboard/article",
     icon: <IconArticle className={iconClassName} />,
   },
@@ -40,6 +57,20 @@ export default function SidebarApp({
   const [open, setOpen] = useState<boolean>(false);
   const { data: session } = useSession();
 
+  if (!session) return null;
+
+  const { user } = session;
+  const { role } = user;
+
+  const USER_LINKS = ["Your Article", "Logout"];
+
+  const filteredLinks = links.filter((link) => {
+    if (role === "Admin") return true;
+    else {
+      return USER_LINKS.includes(link.label);
+    }
+  });
+
   return (
     <div className="rounded-md flex flex-col md:flex-row bg-gray-100 w-full flex-1 mx-auto border border-neutral-200 overflow-hidden h-screen">
       <Sidebar open={open} setOpen={setOpen}>
@@ -47,7 +78,7 @@ export default function SidebarApp({
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
+              {filteredLinks.map((link, idx) => (
                 <SidebarLink
                   key={idx}
                   link={link}

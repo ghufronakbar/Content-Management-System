@@ -16,8 +16,8 @@ export const GET = async () => {
 export const PUT = async (req: NextRequest) => {
   try {
     const { data } = await req.json();
-    const { name, username, description } = data;
-    if (!name || !username || !description)
+    const { name, username, description, title } = data;
+    if (!name || !username || !description || !title)
       return NextResponse.json("All fields are required", { status: 400 });
     if (typeof name !== "string" || typeof username !== "string")
       return NextResponse.json("Invalid format", { status: 400 });
@@ -50,6 +50,7 @@ export const PUT = async (req: NextRequest) => {
         name,
         username,
         description,
+        title,
       },
     });
     return NextResponse.json(updatedUser);
@@ -60,7 +61,7 @@ export const PUT = async (req: NextRequest) => {
 };
 
 export const PATCH = async (req: NextRequest) => {
-  const { data } = await req.json();  
+  const { data } = await req.json();
   const { image } = data;
   const session = await serverSession();
   if (!session) return NextResponse.redirect("/");
