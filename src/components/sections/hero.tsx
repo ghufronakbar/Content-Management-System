@@ -11,8 +11,8 @@ export const HeroSection: React.FC<Props> = ({ item }) => {
   const { heroTitle, imageHero, subtitleHero } = item;
   return (
     <Section id="hero" padded>
-      <div className="w-full min-h-screen h-full flex flex-col md:flex-row items-center justify-center relative gap-20 md:gap-0">
-        <div className="w-full md:w-2/3 lg:w-1/2 h-full flex flex-col gap-8 z-10 min-h-screen justify-center">
+      <div className="w-full min-h-screen h-full flex flex-col-reverse md:flex-row items-center justify-center relative md:gap-0 mt-0">
+        <div className="w-full md:w-1/2 h-full flex flex-col gap-8 z-10 justify-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bely">
             {heroTitle}
           </h1>
@@ -26,21 +26,14 @@ export const HeroSection: React.FC<Props> = ({ item }) => {
             Start Reading
           </Link>
         </div>
-        <div className="w-full md:w-1/2 h-full md:relative absolute">
+        <div className="w-full md:w-1/2 h-full relative">
           <Image
             src={imageHero}
             alt=""
             width={1920}
             height={1080}
             className="w-full h-full object-contain"
-          />
-          <Image
-            src={"/images/shape.png"}
-            alt=""
-            width={1920}
-            height={1080}
-            className="w-full h-full object-contain absolute top-0 left-0 -z-10 hidden"
-          />
+          />          
         </div>
       </div>
     </Section>

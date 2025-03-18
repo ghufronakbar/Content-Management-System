@@ -18,6 +18,7 @@ export const metadata = async (): Promise<Metadata> => {
     },
   };
 };
+
 const getUsers = async () => {
   return await fetch(BASE_URL + "/api/authors", {
     next: { revalidate: 60 },
