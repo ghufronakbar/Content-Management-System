@@ -3,8 +3,8 @@ import ArticlePage from "~/components/page/ArticlePage";
 import { GreetSection } from "~/components/sections/greet";
 import { HeroSection } from "~/components/sections/hero";
 import { TestimonialSection } from "~/components/sections/authors";
-import prisma from "~/config/prisma";
 import { FeatureSection } from "~/components/sections/features";
+import { BASE_URL } from "~/constants";
 
 export const metadata = async (): Promise<Metadata> => {
   const information = await getInformation();
@@ -19,23 +19,22 @@ export const metadata = async (): Promise<Metadata> => {
   };
 };
 const getUsers = async () => {
-  return await prisma.user.findMany({
-    select: {
-      name: true,
-      title: true,
-      description: true,
-      image: true,
-    },
-  });
+  return await fetch(BASE_URL + "/api/authors", {
+    next: { revalidate: 60 },
+  }).then((res) => res.json());
 };
 
 const getInformation = async () => {
-  const informations = await prisma.information.findMany();
-  return informations[0];
+  const informations = await fetch(BASE_URL + "/api/information", {
+    next: { revalidate: 60 },
+  }).then((res) => res.json());
+  return informations;
 };
 
 const getFeatures = async () => {
-  return await prisma.feature.findMany();
+  return await fetch(BASE_URL + "/api/feature", {
+    next: { revalidate: 60 },
+  }).then((res) => res.json());
 };
 
 export default async function Home() {
