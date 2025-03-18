@@ -26,6 +26,7 @@ const InformationPage = () => {
     onSubmit,
     onImageChangeInfo,
     onSave,
+    deleteFeature,
   } = useInformation();
 
   return (
@@ -127,7 +128,7 @@ const InformationPage = () => {
                     </button>
                     <button
                       className="w-fit h-fit rounded-lg px-4 py-2 bg-white text-primary drop-shadow-lg hover:bg-primary/20 transition-all flex flex-row gap-2 items-center text-sm"
-                      onClick={() => {}}
+                      onClick={() => deleteFeature(feature)}
                     >
                       Delete
                     </button>
@@ -238,7 +239,7 @@ const ModalFeature: React.FC<Props> = ({
             <MdClose onClick={onClose} className="cursor-pointer" />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="font-medium text-lg text-black">Hero Image</label>            
+            <label className="font-medium text-lg text-black">Hero Image</label>
             <div
               className="flex flex-col items-center justify-center gap-2 border border-dashed border-gray-300 rounded-md p-2 cursor-pointer hover:bg-gray-100 h-40 transition-all overflow-hidden"
               onClick={() => document.getElementById("imageFeature")?.click()}
@@ -581,6 +582,51 @@ const useInformation = () => {
     }
   };
 
+  const deleteFeature = async (item: Feature) => {
+    try {
+      if (loading) return;
+      const isConfirm = confirm("Are you sure to delete this feature?");
+      if (!isConfirm) return;
+      setLoading(true);
+      toast("Deleting...", {
+        ...optToast,
+        type: "info",
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      const res = await axios.delete(`/api/feature/${item.id}`);
+      await fetchData();
+      toast(res.data?.toString(), {
+        ...optToast,
+        type: "success",
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data || "Something went wrong", {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+        });
+      } else if (error instanceof Error) {
+        toast(error.message, {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+        });
+      } else {
+        toast("Something went wrong", {
+          ...optToast,
+          type: "error",
+          position: "bottom-right",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     information,
     features,
@@ -595,5 +641,6 @@ const useInformation = () => {
     onImageChangeInfo,
     onImageChangeFeat,
     onSave,
+    deleteFeature,
   };
 };
