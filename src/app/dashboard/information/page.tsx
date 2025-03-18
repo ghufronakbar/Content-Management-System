@@ -239,7 +239,7 @@ const ModalFeature: React.FC<Props> = ({
             <MdClose onClick={onClose} className="cursor-pointer" />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="font-medium text-lg text-black">Hero Image</label>
+            <label className="font-medium text-lg text-black">Image</label>
             <div
               className="flex flex-col items-center justify-center gap-2 border border-dashed border-gray-300 rounded-md p-2 cursor-pointer hover:bg-gray-100 h-40 transition-all overflow-hidden"
               onClick={() => document.getElementById("imageFeature")?.click()}
